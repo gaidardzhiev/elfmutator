@@ -1,7 +1,7 @@
 # elfmutator
 
 > *"The moral is obvious. You can't trust code that you did not totally create yourself."*
-> — Ken Thompson, Reflections on Trusting Trust (1984)
+> - Ken Thompson, *Reflections on Trusting Trust (1984)*
 
 ## Abstract
 
