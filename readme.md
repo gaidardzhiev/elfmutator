@@ -10,15 +10,15 @@
 The result is a binary that does something it was never written to do, and shows no outward sign of it.
 
 ```
-                  ┌─────────────────────────────┐
-                  │         out.elf              │
-                  │                              │
-  kernel          │  [entry] ──────────────────► │  payload runs
-  execve ────────►│                              │  (write syscall)
-                  │  payload: b main  ──────────►│  main() runs
-                  │                              │  (original code)
-                  │  [exit]                      │
-                  └─────────────────────────────┘
+                  --------------------------------
+                  |         out.elf              |
+                  |                              |
+  kernel          |  [entry] ------------------> |  payload runs
+  execve -------->|                              |  (write syscall)
+                  |  payload: b main ----------> |  main() runs
+                  |                              |  (original code)
+                  |  [exit]                      |
+                  --------------------------------
 ```
 
 The host binary never consented to this. Neither did you, necessarily, when you ran a binary someone else compiled.
@@ -153,4 +153,4 @@ Understanding the mechanism is the only partial defense. You cannot eliminate th
 
 ## License
 
-GPL-3.0
+GPL-3.0-only
