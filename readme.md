@@ -3,6 +3,16 @@
 > *"The moral is obvious. You can't trust code that you did not totally create yourself."*
 > - Ken Thompson, *Reflections on Trusting Trust (1984)*
 
+## Disclaimer
+
+**This project is a security research and educational demonstration only.**
+
+`elfmutator` and all payloads in this repository are published to illustrate binary level trust concepts described in Ken Thompson's 1984 Turing Award lecture. They are intended for use in controlled environments, on systems you own or have explicit written permission to test.
+
+The author assumes no liability for any misuse of this code. Using these tools against systems without authorization is **illegal and is explicitly not condoned**. If you use this code for anything other than education and authorized research, that is your choice and your legal responsibility, not the author's.
+
+The techniques demonstrated here are decades old, widely documented, and available in every shellcode reference in existence. Publishing them in a clear, understandable form for researchers and students does not make the world less safe. Hiding them does not make it more safe. Understanding them does.
+
 ## Abstract
 
 `elfmutator` is a minimal ARM32 ELF binary injector. It takes a compiled binary, appends a shellcode payload as a new loadable segment, redirects the ELF entry point to the payload, and patches the payload's stub instruction with a branch back to the original program, so the host binary executes normally after the payload runs.
