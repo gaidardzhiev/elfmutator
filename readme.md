@@ -7,7 +7,7 @@
 
 **This project is a security research and educational demonstration only.**
 
-`elfmutator` and all payloads in this repository are published to illustrate binary level trust concepts described in Ken Thompson's 1984 Turing Award lecture. They are intended for use in controlled environments, on systems you own or have explicit written permission to test.
+`elfmutator` and all payloads in this repository are published to illustrate binary level trust concepts described first in Ken Thompson's 1984 Turing Award lecture. They are intended for use in controlled environments, on systems you own or have explicit written permission to test.
 
 The author assumes no liability for any misuse of this code. Using these tools against systems without authorization is **illegal and is explicitly not condoned**. If you use this code for anything other than education and authorized research, that is your choice and your legal responsibility, not the author's.
 
