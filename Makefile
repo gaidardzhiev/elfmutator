@@ -30,10 +30,7 @@ spawn:
 	chmod +x spawn.elf
 	readelf -h spawn.elf
 	readelf -l spawn.elf
-	echo
-	echo "open a new terminal and run nc -lvp 30303"
-	echo "then execute ./spawn.elf in the old terminal"
-	echo "then on the other terminal try the shell"
+	./spawn.elf
 
 debug: test.o out.elf payload.bin
 	@printf "\nmain() disassembly\n"

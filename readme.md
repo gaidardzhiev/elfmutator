@@ -108,6 +108,8 @@ make debug
 nc -lvp 30303
 #on terminal 2 in the root of tree
 make spawn
+#or
+./spawn.elf
 #on terminal 1 try:
 ls
 cat /proc/cpuinfo
