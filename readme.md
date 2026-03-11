@@ -47,7 +47,7 @@ Thompson's conclusion was not that you should audit your compiler. It was that y
 
 An ELF executable contains program headers describing loadable segments. The kernel reads these at `execve` time and maps each `PT_LOAD` segment into the process's virtual address space. The entry point (`e_entry`) is a virtual address the kernel jumps to after mapping is done.
 
-elfmutator adds one more `PT_LOAD` segment, page aligned, readable and executable, containing the payload, then sets `e_entry` to the start of that segment.
+`elfmutator` adds one more `PT_LOAD` segment, page aligned, readable and executable, containing the payload, then sets `e_entry` to the start of that segment.
 
 ```
 Original ELF:                    Mutated ELF:
@@ -95,7 +95,7 @@ To build the `elfmutator` injector:
 make
 ```
 
-To assemble the simple payload that just prints a string to a flat binary:
+To assemble the simple payload to a flat binary that just prints a string:
 ```
 make payload
 ```
@@ -128,7 +128,7 @@ cat /proc/cpuinfo
 ps aux
 ```
 
-**Inspect the [Makefile](./Makefile) to understand the build patterns for creating new targets.**
+**Inspect the [Makefile](./Makefile) to understand the build patterns for creating new targets and payloads.**
 
 ### Manual injection
 
