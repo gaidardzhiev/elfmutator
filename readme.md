@@ -90,31 +90,45 @@ The clean solution for libc binaries is a separate unsolved problem. The clean s
 
 ## Usage
 
-```sh
-#build the injector
+To build the `elfmutator` injector:
+```
 make
+```
 
-#assemble the payload to a flat binary
+To assemble the simple payload that just prints a string to a flat binary:
+```
 make payload
+```
 
-#compile a target, inject, and run
+To compile a target, inject, and run the first simple payload:
+```
 make test
+```
 
-#debug: disassembly, segment inspection, strace
+Debuging by disassembly, segment inspection, strace:
+```
 make debug
+```
 
-#reverse shell demo:
-#on terminal 1
+To try the reverse shell demo open two terminals and:
+- on terminal 1:
+```
 nc -lvp 30303
-#on terminal 2 in the root of tree
+```
+
+- on terminal 2 in the root of the tree of the project:
+```
 make spawn
-#or
-./spawn.elf
-#on terminal 1 try:
+```
+
+- then go back to terminal 1 and try:
+```
 ls
 cat /proc/cpuinfo
 ps aux
 ```
+
+**Inspect the [Makefile](./Makefile) to understand the build patterns for creating new targets.**
 
 ### Manual injection
 
