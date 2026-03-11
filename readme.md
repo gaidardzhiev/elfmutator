@@ -140,7 +140,7 @@ The input must be an ARM32 ELF executable with at least one `PT_LOAD` segment an
 
 ## Payload format
 
-The payload is a flat ARM32 binary (no ELF headers). It must contain exactly one `b .` stub `fe ff ff ea` which elfmutator will patch with a branch to the target. Data must come after all code so the stub offset scan finds the right bytes.
+The payload is a flat ARM32 binary (no ELF headers). It must contain exactly one `b .` stub `fe ff ff ea` which `elfmutator` will patch with a branch to the target. Data must come after all code so the stub offset scan finds the right bytes.
 **For payloads with conditional branches, use `.inst 0xEAFFFFFE` to be safe.**
 
 ```asm
